@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Fresh Knowledge Filter — AI Ethics Scenario</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFE9DA;
+    --paper-dark:#E4DCC8;
+    --ink:#221F1B;
+    --ink-soft:#57534A;
+    --navy:#1C2A38;
+    --navy-2:#28394A;
+    --amber:#B9812E;
+    --amber-light:#E4C583;
+    --red:#A3382A;
+    --red-dark:#7A2A20;
+    --teal:#3E6B62;
+    --teal-light:#CFE0DA;
+    --line:#C9C0A9;
+    --font-serif:'Fraunces', Georgia, serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-sans:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#DCD4BE;
+    font-family:var(--font-sans);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 40px;
+  }
+  .app{
+    width:100%;
+    max-width:980px;
+  }
+  .filehead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin:0 4px 10px;
+    color:var(--navy);
+  }
+  .filehead .tag{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .filehead .title{
+    font-family:var(--font-serif);
+    font-weight:600;
+    font-size:15px;
+  }
+  .stage-wrap{
+    position:relative;
+    width:100%;
+    background:var(--paper);
+    border-radius:6px;
+    box-shadow:0 1px 0 rgba(0,0,0,.05), 0 18px 34px -20px rgba(20,18,14,.45);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .scene{
+    display:none;
+    flex-direction:column;
+    min-height:460px;
+  }
+  .scene.active{
+    display:flex;
+    animation:sceneIn .4s ease;
+  }
+  @keyframes sceneIn{
+    from{opacity:0;}
+    to{opacity:1;}
+  }
+  .scene-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 30px 0;
+  }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--amber);
+    background:rgba(185,129,46,.12);
+    padding:4px 10px;
+    border-radius:3px;
+    border:1px solid rgba(185,129,46,.35);
+  }
+  .scene-num{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .scene-title{
+    font-family:var(--font-serif);
+    font-weight:600;
+    font-size:22px;
+    color:var(--navy);
+    margin:10px 30px 0;
+  }
+  .scene-visual{
+    flex:1;
+    position:relative;
+    margin:6px 30px;
+    min-height:0;
+  }
+  .scene-visual svg{width:100%;height:100%;display:block;}
+  .caption{
+    margin:0 30px 20px;
+    font-family:var(--font-serif);
+    font-style:italic;
+    font-size:14px;
+    color:var(--ink);
+    border-left:3px solid var(--amber);
+    padding-left:12px;
+    line-height:1.5;
+  }
+
+  /* --- title scene --- */
+  .title-scene{
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:
+      linear-gradient(var(--paper), var(--paper));
+  }
+  .title-scene .kicker{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .title-scene h1{
+    font-family:var(--font-serif);
+    font-weight:600;
+    font-size:36px;
+    color:var(--navy);
+    margin:0 0 12px;
+    max-width:640px;
+  }
+  .title-scene .sub{
+    font-family:var(--font-sans);
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:480px;
+  }
+  .stamp-badge{
+    margin-top:26px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--red);
+    border:1.5px solid var(--red);
+    padding:6px 14px;
+    border-radius:3px;
+    transform:rotate(-3deg);
+    opacity:0;
+  }
+  .scene.active .stamp-badge{
+    animation:stampIn .5s ease .5s forwards;
+  }
+  @keyframes stampIn{
+    0%{opacity:0; transform:rotate(-3deg) scale(1.6);}
+    60%{opacity:1;}
+    100%{opacity:1; transform:rotate(-3deg) scale(1);}
+  }
+
+  /* --- stop scenes --- */
+  .stop-scene{
+    background:var(--navy);
+    color:#fff;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:26px;
+    position:relative;
+  }
+  .stop-stamp{
+    font-family:var(--font-mono);
+    font-weight:600;
+    font-size:30px;
+    letter-spacing:.06em;
+    color:var(--red);
+    border:3px solid var(--red);
+    padding:5px 20px;
+    border-radius:4px;
+    transform:rotate(-4deg) scale(1.4);
+    opacity:0;
+    margin-bottom:16px;
+  }
+  .scene.active .stop-stamp{
+    animation:stopIn .45s cubic-bezier(.2,.8,.3,1.2) forwards;
+  }
+  @keyframes stopIn{
+    0%{opacity:0; transform:rotate(-4deg) scale(2.2);}
+    70%{opacity:1;}
+    100%{opacity:1; transform:rotate(-4deg) scale(1);}
+  }
+  .stop-question{
+    font-family:var(--font-serif);
+    font-size:19px;
+    max-width:640px;
+    line-height:1.4;
+    margin:0 0 18px;
+  }
+  .stop-hint{
+    display:none;
+  }
+  .reveal-btn{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:transparent;
+    border:1px solid rgba(255,255,255,.4);
+    color:#fff;
+    padding:8px 16px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .reveal-btn:hover{background:rgba(255,255,255,.1);}
+  .reveal-panel{
+    max-width:560px;
+    margin-top:16px;
+    text-align:left;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:6px;
+    padding:14px 18px;
+    font-size:13px;
+    line-height:1.6;
+    display:none;
+  }
+  .reveal-panel.open{display:block;}
+  .reveal-panel .fw-line{margin:0 0 6px;}
+  .reveal-panel .fw-tag{
+    font-family:var(--font-mono);
+    color:var(--amber-light);
+    margin-right:6px;
+  }
+
+  /* --- closing scene --- */
+  .close-scene{padding:26px 30px;}
+  .close-cols{
+    display:flex;
+    gap:14px;
+    margin-top:8px;
+    flex:1;
+  }
+  .close-col{
+    flex:1;
+    background:var(--paper-dark);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 16px;
+  }
+  .close-col .who{font-family:var(--font-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--amber); margin-bottom:8px;}
+  .close-col p{font-family:var(--font-sans); font-size:15px; color:var(--ink); line-height:1.55; margin:0;}
+
+  /* --- controls --- */
+  .controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+    padding:0 4px;
+  }
+  .navbtns{display:flex; gap:8px;}
+  .navbtn{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .navbtn.secondary{
+    background:transparent;
+    color:var(--navy);
+    border:1px solid var(--navy);
+  }
+  .navbtn:disabled{opacity:.35; cursor:default;}
+  .dots{display:flex; gap:6px; align-items:center;}
+  .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--line);
+  }
+  .dot.done{background:var(--amber);}
+  .dot.on{background:var(--red); width:9px; height:9px;}
+  .stepcount{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  /* --- svg helpers --- */
+  .lbl{font-family:'IBM Plex Mono',monospace; font-size:12px; fill:var(--ink-soft);}
+  .lblbold{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="filehead">
+    <span class="title">The fresh knowledge filter</span>
+    <span class="tag">AI ethics training · scenario video</span>
+  </div>
+
+  <div class="stage-wrap" id="stage">
+
+    <!-- 0 TITLE -->
+    <div class="scene title-scene" data-step="0">
+      <div class="kicker">Case file — ethical decision-making in the age of AI</div>
+      <h1>The Fresh Knowledge Filter</h1>
+      <p class="sub">A shadow AI hiring scenario. Watch for the moments a governance framework should have caught this.</p>
+      <div class="stamp-badge">FOR TRAINING USE</div>
+    </div>
+
+    <!-- 1 SCENE 1 -->
+    <div class="scene" data-step="1">
+      <div class="scene-top"><span class="eyebrow">The setup</span><span class="scene-num">Scene 1 / 6</span></div>
+      <div class="scene-title">A high-volume hiring season</div>
+      <div class="scene-visual" id="viz1"></div>
+      <p class="caption">Applications for a Senior Analyst role are way up. The company's approved AI screening tool is helping — but it's slow.</p>
+    </div>
+
+    <!-- 2 SCENE 2 -->
+    <div class="scene" data-step="2">
+      <div class="scene-top"><span class="eyebrow">The workaround</span><span class="scene-num">Scene 2 / 6</span></div>
+      <div class="scene-title">A faster, unapproved tool</div>
+      <div class="scene-visual" id="viz2"></div>
+      <p class="caption">Frustrated, someone on the HR team redacts identifying info and batch-uploads applications to a faster tool — one that was never approved.</p>
+    </div>
+
+    <!-- 3 STOP 1 -->
+    <div class="scene stop-scene" data-step="3">
+      <div class="stop-stamp">STOP</div>
+      <p class="stop-question">"What's the first red flag here — before we even know the outcome?"</p>
+      <p class="stop-hint">Quick call-out, 60 seconds. No wrong answers yet.</p>
+      <button class="reveal-btn" data-reveal="r1">Show framework tie-in</button>
+      <div class="reveal-panel" id="r1">
+        <p class="fw-line"><span class="fw-tag">WHAT →</span>Shadow AI. An unapproved tool was used outside the governance process — no one checked the tool or the prompt first.</p>
+        <p class="fw-line"><span class="fw-tag">ALSO →</span>Data was redacted, but the prompt itself was never reviewed for risky language.</p>
+      </div>
+    </div>
+
+    <!-- 4 SCENE 3 -->
+    <div class="scene" data-step="4">
+      <div class="scene-top"><span class="eyebrow">What you notice</span><span class="scene-num">Scene 3 / 6</span></div>
+      <div class="scene-title">Almost everyone interviewed is under 35</div>
+      <div class="scene-visual" id="viz3"></div>
+      <p class="caption">The team pulls the full applicant pool to compare against who actually got screened out.</p>
+    </div>
+
+    <!-- 5 SCENE 4 -->
+    <div class="scene" data-step="5">
+      <div class="scene-top"><span class="eyebrow">The pattern</span><span class="scene-num">Scene 4 / 6</span></div>
+      <div class="scene-title">Qualified. Filtered out anyway.</div>
+      <div class="scene-visual" id="viz4"></div>
+      <p class="caption">Candidates with 15–20 years of directly relevant experience — some using the company's current tech stack for a decade — never made it past round one.</p>
+    </div>
+
+    <!-- 6 STOP 2 -->
+    <div class="scene stop-scene" data-step="6">
+      <div class="stop-stamp">STOP</div>
+      <p class="stop-question">"No one asked the AI to filter by age. So where did this actually go wrong in our framework?"</p>
+      <p class="stop-hint">Quick call-out, 60–90 seconds.</p>
+      <button class="reveal-btn" data-reveal="r2">Show framework tie-in</button>
+      <div class="reveal-panel" id="r2">
+        <p class="fw-line"><span class="fw-tag">HOW →</span>No Process Flow Diagram step existed to review prompts or audit outputs before decisions were made.</p>
+        <p class="fw-line"><span class="fw-tag">WHAT →</span>An unapproved tool never went through vetting that might have caught this.</p>
+      </div>
+    </div>
+
+    <!-- 7 SCENE 5 -->
+    <div class="scene" data-step="7">
+      <div class="scene-top"><span class="eyebrow">But wait</span><span class="scene-num">Scene 5 / 6</span></div>
+      <div class="scene-title">Nobody coded "age." The model found a proxy for it.</div>
+      <div class="scene-visual" id="viz5"></div>
+      <p class="caption">"Fresh knowledge" was meant to mean recent hands-on skill. The model read it as recency of education — graduation year was the closest signal it had.</p>
+    </div>
+
+    <!-- 8 STOP 3 -->
+    <div class="scene stop-scene" data-step="8">
+      <div class="stop-stamp">STOP</div>
+      <p class="stop-question">"If you owned this program, what's the one framework piece you'd point to first — Who, What, or How?"</p>
+      <p class="stop-hint">Any defensible answer works — push for one concrete fix.</p>
+      <button class="reveal-btn" data-reveal="r3">Show framework tie-in</button>
+      <div class="reveal-panel" id="r3">
+        <p class="fw-line"><span class="fw-tag">WHO →</span>HR/Legal and the Core AI Team should own review of hiring prompts, not an individual, in the moment.</p>
+        <p class="fw-line"><span class="fw-tag">WHAT →</span>The tool should never have been usable without Shadow AI approval first.</p>
+        <p class="fw-line"><span class="fw-tag">HOW →</span>A process flow with a bias-check / human-review gate before any candidate is filtered out.</p>
+      </div>
+    </div>
+
+    <!-- 9 CLOSE -->
+    <div class="scene close-scene" data-step="9">
+      <div class="scene-top"><span class="eyebrow">Debrief</span><span class="scene-num">Scene 6 / 6</span></div>
+      <div class="scene-title">One missing piece, three points of failure</div>
+      <div class="close-cols">
+        <div class="close-col"><div class="who">Who</div><p>Ownership was undefined in the moment — no one felt it was their job to flag a new tool or review the prompt.</p></div>
+        <div class="close-col"><div class="who">What</div><p>Shadow AI: a well-intentioned workaround bypassed the approved toolkit entirely.</p></div>
+        <div class="close-col"><div class="who">How</div><p>No process step existed to catch proxy bias before it reached real candidates.</p></div>
+      </div>
+      <p class="caption">The AI didn't need to be told to discriminate by age — it found the nearest signal to a fuzzy instruction. That's exactly what a governance framework exists to catch.</p>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <div class="navbtns">
+      <button class="navbtn secondary" id="prevBtn">← Back</button>
+      <button class="navbtn" id="nextBtn">Next →</button>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="stepcount" id="stepcount">1 / 10</div>
+  </div>
+</div>
+
+<script>
+const STOP_STEPS = [3,6,8];
+let current = 0;
+const scenes = document.querySelectorAll('.scene');
+const total = scenes.length;
+const dotsEl = document.getElementById('dots');
+const stepcountEl = document.getElementById('stepcount');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+for(let i=0;i<total;i++){
+  const d = document.createElement('div');
+  d.className = 'dot';
+  dotsEl.appendChild(d);
+}
+
+function render(){
+  scenes.forEach((s,i)=>{ s.classList.toggle('active', i===current); });
+  const dots = dotsEl.children;
+  for(let i=0;i<total;i++){
+    dots[i].classList.toggle('done', i<current);
+    dots[i].classList.toggle('on', i===current);
+  }
+  stepcountEl.textContent = (current+1)+' / '+total;
+  prevBtn.disabled = current===0;
+  const onStop = STOP_STEPS.includes(current);
+  nextBtn.textContent = onStop ? 'Resume ▶' : (current===total-1 ? 'Restart ↺' : 'Next →');
+}
+
+function go(delta){
+  const n = current+delta;
+  if(n<0) return;
+  if(n>=total){ current=0; render(); return; }
+  current = n;
+  render();
+}
+
+prevBtn.addEventListener('click', ()=>go(-1));
+nextBtn.addEventListener('click', ()=>go(1));
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowRight') go(1);
+  if(e.key==='ArrowLeft') go(-1);
+});
+
+document.querySelectorAll('.reveal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const panel = document.getElementById(btn.dataset.reveal);
+    const isOpen = panel.classList.toggle('open');
+    btn.textContent = isOpen ? 'Hide framework tie-in' : 'Show framework tie-in';
+  });
+});
+
+render();
+
+/* ---------- SVG scene builders ---------- */
+const NS='http://www.w3.org/2000/svg';
+function svg(el, w, h){
+  const s = document.createElementNS(NS,'svg');
+  s.setAttribute('viewBox','0 0 '+w+' '+h);
+  el.appendChild(s);
+  return s;
+}
+function rect(parent,x,y,w,h,r,fill,stroke){
+  const e=document.createElementNS(NS,'rect');
+  e.setAttribute('x',x);e.setAttribute('y',y);e.setAttribute('width',w);e.setAttribute('height',h);
+  if(r)e.setAttribute('rx',r);
+  e.setAttribute('fill',fill||'none');
+  if(stroke)e.setAttribute('stroke',stroke);
+  parent.appendChild(e);
+  return e;
+}
+function text(parent,x,y,str,cls,fill,anchor){
+  const e=document.createElementNS(NS,'text');
+  e.setAttribute('x',x);e.setAttribute('y',y);
+  e.setAttribute('class',cls||'lbl');
+  if(fill)e.style.fill=fill;
+  e.setAttribute('text-anchor',anchor||'start');
+  e.textContent=str;
+  parent.appendChild(e);
+  return e;
+}
+function line(parent,x1,y1,x2,y2,stroke,w,dash){
+  const e=document.createElementNS(NS,'line');
+  e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);
+  e.setAttribute('stroke',stroke);e.setAttribute('stroke-width',w||1.5);
+  if(dash)e.setAttribute('stroke-dasharray',dash);
+  parent.appendChild(e);
+  return e;
+}
+
+/* Scene 1: funnel of applications into the approved tool */
+(function(){
+  const s = svg(document.getElementById('viz1'),640,300);
+  text(s,320,26,'APPLICANT POOL', 'lbl',null,'middle');
+  for(let i=0;i<10;i++){
+    const x = 90+i*46;
+    const r = rect(s,x,50,30,20,3,'#fff','#C9C0A9');
+    r.style.animation = 'fall 2.4s ease-in-out infinite';
+    r.style.animationDelay = (i*0.15)+'s';
+    r.style.transformOrigin = 'center';
+  }
+  const style = document.createElementNS(NS,'style');
+  style.textContent = '@keyframes fall{0%{transform:translateY(0);opacity:1}45%{transform:translateY(90px);opacity:.5}46%{opacity:0}47%{transform:translateY(90px)}100%{transform:translateY(90px);opacity:0}}';
+  s.appendChild(style);
+
+  // funnel
+  const pts = '250,150 390,150 340,220 300,220';
+  const f = document.createElementNS(NS,'polygon');
+  f.setAttribute('points',pts);
+  f.setAttribute('fill','#E4C583');
+  f.setAttribute('stroke','#B9812E');
+  s.appendChild(f);
+  text(s,320,190,'SCREENING','lblbold','#7A5A1E','middle');
+
+  line(s,320,222,320,250,'#57534A',1.5);
+  rect(s,250,250,140,34,4,'#1C2A38');
+  text(s,320,271,'Approved AI tool','lbl','#fff','middle');
+
+  // progress bar crawling
+  rect(s,240,296,160,6,3,'none','#C9C0A9');
+  const bar = rect(s,240,296,20,6,3,'#B9812E');
+  bar.innerHTML = '<animate attributeName="width" values="10;150;10" dur="3s" repeatCount="indefinite" />';
+})();
+
+/* Scene 2: redaction + unapproved tool + prompt typing */
+(function(){
+  const s = svg(document.getElementById('viz2'),640,300);
+  // resume card
+  rect(s,60,40,180,140,5,'#fff','#C9C0A9');
+  text(s,80,66,'APPLICANT_014.PDF','lbl',null,'start');
+  for(let i=0;i<4;i++){
+    line(s,80,86+i*16,220,86+i*16,'#D8D2C2',6);
+  }
+  const redact = rect(s,80,84,90,10,2,'#221F1B');
+  redact.style.animation = 'wipe 3s ease-in-out infinite';
+  const st = document.createElementNS(NS,'style');
+  st.textContent = '@keyframes wipe{0%{opacity:0;transform:scaleX(0);transform-origin:left}20%{opacity:1;transform:scaleX(1)}100%{opacity:1;transform:scaleX(1)}}@keyframes slideOver{0%{transform:translateX(0)}60%{transform:translateX(0)}100%{transform:translateX(260px)}}';
+  s.appendChild(st);
+
+  // arrow to unapproved tool
+  line(s,250,110,330,110,'#57534A',1.5);
+  const arrowhead = document.createElementNS(NS,'polygon');
+  arrowhead.setAttribute('points','330,104 344,110 330,116');
+  arrowhead.setAttribute('fill','#57534A');
+  s.appendChild(arrowhead);
+
+  rect(s,350,70,160,80,5,'#A3382A');
+  text(s,430,105,'UNAPPROVED TOOL','lblbold','#fff','middle');
+  text(s,430,124,'no company badge','lbl','#F3D9D4','middle');
+  const flag = document.createElementNS(NS,'circle');
+  flag.setAttribute('cx',498);flag.setAttribute('cy',80);flag.setAttribute('r',9);
+  flag.setAttribute('fill','#EFE9DA');
+  s.appendChild(flag);
+  text(s,498,84,'!','lblbold','#A3382A','middle');
+
+  // prompt card
+  rect(s,60,200,530,80,5,'#1C2A38');
+  text(s,80,222,'SCREENING PROMPT','lbl','#E4C583','start');
+  const t1 = text(s,80,246,'','lbl','#fff','start');
+  const full = '"...prioritize candidates with \'fresh knowledge\' and';
+  const full2 = '\'current, up-to-date expertise\'..."';
+  const t2 = text(s,80,266,'','lbl','#fff','start');
+  let i=0;
+  function typeLine(){
+    if(i<=full.length){ t1.textContent = full.slice(0,i); i++; setTimeout(typeLine,18);}
+    else if(i-full.length-1<=full2.length){ t2.textContent = full2.slice(0,i-full.length-1); i++; setTimeout(typeLine,18); }
+  }
+  typeLine();
+})();
+
+/* Scene 3: bar chart of interview skew */
+(function(){
+  const s = svg(document.getElementById('viz3'),640,300);
+  text(s,320,26,'CANDIDATES INVITED TO INTERVIEW','lbl',null,'middle');
+  const baseY = 240;
+  // bar 1: post-2004 grads (tall)
+  rect(s,180,baseY-4,110,4,2,'#3E6B62').setAttribute('id','b1');
+  const b1 = document.querySelector('#viz3 rect[id="b1"]');
+  b1.innerHTML='<animate attributeName="y" from="'+(baseY-4)+'" to="'+(baseY-170)+'" dur="1.1s" fill="freeze" begin="0.2s"/><animate attributeName="height" from="4" to="170" dur="1.1s" fill="freeze" begin="0.2s"/>';
+  text(s,235,baseY+22,'Grads after 2004','lbl',null,'middle');
+
+  // bar 2: pre-2004 grads (short)
+  rect(s,350,baseY-4,110,4,2,'#A3382A').setAttribute('id','b2');
+  const b2 = document.querySelector('#viz3 rect[id="b2"]');
+  b2.innerHTML='<animate attributeName="y" from="'+(baseY-4)+'" to="'+(baseY-28)+'" dur="1.1s" fill="freeze" begin="0.5s"/><animate attributeName="height" from="4" to="28" dur="1.1s" fill="freeze" begin="0.5s"/>';
+  text(s,405,baseY+22,'Grads before 2004','lbl',null,'middle');
+
+  line(s,150,baseY,530,baseY,'#57534A',1.5);
+})();
+
+/* Scene 4: resume comparison, stamps */
+(function(){
+  const s = svg(document.getElementById('viz4'),640,300);
+  // card left - senior, rejected
+  rect(s,60,50,240,190,5,'#fff','#C9C0A9');
+  text(s,80,78,'18 yrs experience','lblbold',null,'start');
+  text(s,80,100,'Current tech stack — 10+ yrs','lbl',null,'start');
+  text(s,80,120,'Certified 2025','lbl',null,'start');
+  text(s,80,140,'Grad. year: 1998','lbl',null,'start');
+  const stamp1 = document.createElementNS(NS,'g');
+  stamp1.setAttribute('transform','translate(180,200) rotate(-14)');
+  stamp1.innerHTML = '<rect x="-70" y="-16" width="140" height="34" rx="4" fill="none" stroke="#A3382A" stroke-width="2.5"/><text x="0" y="6" text-anchor="middle" class="lblbold" fill="#A3382A" font-size="15">REJECTED</text>';
+  s.appendChild(stamp1);
+  stamp1.style.opacity='0';
+  stamp1.style.animation='popIn .4s ease .6s forwards';
+
+  // card right - junior, interview
+  rect(s,340,50,240,190,5,'#fff','#C9C0A9');
+  text(s,360,78,'2 yrs experience','lblbold',null,'start');
+  text(s,360,100,'Recent bootcamp grad','lbl',null,'start');
+  text(s,360,120,'No certifications yet','lbl',null,'start');
+  text(s,360,140,'Grad. year: 2023','lbl',null,'start');
+  const stamp2 = document.createElementNS(NS,'g');
+  stamp2.setAttribute('transform','translate(460,200) rotate(-8)');
+  stamp2.innerHTML = '<rect x="-70" y="-16" width="140" height="34" rx="4" fill="none" stroke="#3E6B62" stroke-width="2.5"/><text x="0" y="6" text-anchor="middle" class="lblbold" fill="#3E6B62" font-size="15">INTERVIEW</text>';
+  s.appendChild(stamp2);
+  stamp2.style.opacity='0';
+  stamp2.style.animation='popIn .4s ease .9s forwards';
+
+  const st=document.createElementNS(NS,'style');
+  st.textContent='@keyframes popIn{0%{opacity:0;transform:translate(180,200) rotate(-14) scale(1.8)}100%{opacity:1;transform:translate(180,200) rotate(-14) scale(1)}}';
+  s.appendChild(st);
+})();
+
+/* Scene 5: proxy signal diagram */
+(function(){
+  const s = svg(document.getElementById('viz5'),640,260);
+  rect(s,40,100,170,60,6,'#E4C583','#B9812E');
+  text(s,125,135,'"fresh knowledge"','lblbold','#7A5A1E','middle');
+
+  const p1 = line(s,220,130,320,130,'#57534A',1.5,'6 4');
+  p1.style.strokeDashoffset='0';
+  p1.innerHTML='<animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/>';
+  const ah1 = document.createElementNS(NS,'polygon');
+  ah1.setAttribute('points','320,124 334,130 320,136');
+  ah1.setAttribute('fill','#57534A');
+  s.appendChild(ah1);
+
+  const circ = document.createElementNS(NS,'circle');
+  circ.setAttribute('cx',360);circ.setAttribute('cy',130);circ.setAttribute('r',26);
+  circ.setAttribute('fill','none');circ.setAttribute('stroke','#1C2A38');circ.setAttribute('stroke-width',2.5);
+  s.appendChild(circ);
+  const handle = document.createElementNS(NS,'line');
+  handle.setAttribute('x1',379);handle.setAttribute('y1',149);handle.setAttribute('x2',396);handle.setAttribute('y2',166);
+  handle.setAttribute('stroke','#1C2A38');handle.setAttribute('stroke-width',3.5);
+  s.appendChild(handle);
+  text(s,360,192,'model interprets','lbl',null,'middle');
+
+  const p2 = line(s,420,130,500,130,'#57534A',1.5,'6 4');
+  p2.innerHTML='<animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/>';
+  const ah2 = document.createElementNS(NS,'polygon');
+  ah2.setAttribute('points','500,124 514,130 500,136');
+  ah2.setAttribute('fill','#57534A');
+  s.appendChild(ah2);
+
+  rect(s,514,100,110,60,6,'#A3382A');
+  text(s,569,128,'graduation','lbl','#fff','middle');
+  text(s,569,146,'year','lblbold','#fff','middle');
+
+  text(s,569,190,'closest available signal','lbl',null,'middle');
+})();
+</script>
+</body>
+</html>
